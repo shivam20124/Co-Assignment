@@ -37,7 +37,9 @@ def mov(x):
 
 def add(x):
     sum_reg = reg_dict[x[2]] + reg_dict[x[3]]
-    #if sum_reg > 255:
+    if sum_reg > 65535:
+        reg_dict["FLAGS"] = "1000"
+        return()
     reg_dict[x[1]] = sum_reg
     out = "00000" + "00" + op_dict[x[1]] + op_dict[x[2]] + op_dict[x[3]]
     o_list.append(out)
@@ -126,8 +128,8 @@ def ls(x):
 
 
 
-reg_dict = {"R0" : 0, "R1" : 0, "R2" : 0, "R3" : 0, "R4" : 0, "R5" :0, "R6" : 0}
-op_dict = {"R0" : "000", "R1" : "001", "R2" : "010", "R3" : "011", "R4" : "100", "R5" : "101", "R6" : "110"}
+reg_dict = {"R0" : 0, "R1" : 0, "R2" : 0, "R3" : 0, "R4" : 0, "R5" :0, "R6" : 0, "FLAGS" : "0000"}
+op_dict = {"R0" : "000", "R1" : "001", "R2" : "010", "R3" : "011", "R4" : "100", "R5" : "101", "R6" : "110", "FLAGS" : "111"}
 var_count = {}
 count = 0;
 o_list=[]

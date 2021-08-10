@@ -130,6 +130,7 @@ def ls(x):
 
 reg_dict = {"R0" : 0, "R1" : 0, "R2" : 0, "R3" : 0, "R4" : 0, "R5" :0, "R6" : 0, "FLAGS" : "0000"}
 op_dict = {"R0" : "000", "R1" : "001", "R2" : "010", "R3" : "011", "R4" : "100", "R5" : "101", "R6" : "110", "FLAGS" : "111"}
+ins_list=["add","sub","mov","ld","st","mul","div","rs","ls","xor","or","and","not","cmp","jmp","jlt","jgt","je","hlt"]
 var_count = {}
 count = 0;
 o_list=[]
@@ -142,6 +143,7 @@ for i in range(0,4):
     print(x)
         
     if x[0][-1] == ":":
+          if x[0][0:len(x)]
         #label wala function
         continue
     elif (x[0] == "var"):

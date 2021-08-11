@@ -41,7 +41,7 @@ def mov(x):
 def add(x):
     sum_reg = reg_dict[x[2]] + reg_dict[x[3]]
     
-    if sum_reg > 65535:  # greatest 8 bit number
+    if sum_reg > 65535:  # greatest 16 bit number
         reg_dict[x[1]]= 65535 & sum_reg
         reg_dict["FLAGS"]="1000"
     else:
@@ -69,10 +69,10 @@ def mul(x):
     pro_reg = (reg_dict[x[2]])*(reg_dict[x[3]]) 
     if pro_reg < 65535:
         reg_dict[x[1]] = pro_reg
-        reg_dict["FLAGS"]="1000"
+        reg_dict["FLAGS"]="0000"
     else:
          reg_dict[x[1]]= 65535 & pro_reg
-         reg_dict["FLAGS"]="0000"
+         reg_dict["FLAGS"]="1000"
         
     out = "00110" + "00" + op_dict[x[1]] + op_dict[x[2]] + op_dict[x[3]]
     o_list.append(out)
@@ -197,6 +197,7 @@ var_dict = {}
 label_dict={}
 ins_list=["add","sub","mov","ld","st","mul","div","rs","ls","xor","or","and","not","cmp","jmp","jlt","jgt","je","hlt"]
 firstCount=-1
+#firstAbsoluteCount=0
 count = 0
 var_flag=0 #var in beginning
 hlt_flag=0 #hlt in end
@@ -206,29 +207,39 @@ o_list=[]
 fi = open('input.txt', 'r+')
 inp = fi.read()
 inp = inp.split('\n')
+for i in inp:
+    if(i==" "):
+        inp.remove(i)
 
 for i in range(0,len(inp)):  #firts pass
     
-    
+    labelError=0
+    varError=0
     x = inp[i].split(' ')
 
     x = own_split(x)
     print(x)
     firstCount+=1
+    #firstAbsoluteCount+=1
     
     if(x[0][-1]==":"):
         if(x[0][0:-1] not in ins_list and x[0][0:-1] not in var_dict ):
             label_dict[x[0][0:-1]]=[firstCount,x[1:]]
         else:
-            print("invalid label name in line  ",firstCount)
+           
+            labelError=i+1
+            error_flag=1
             break
             
     if(x[0]=="var"):
-        firstCount-=1
+       
         if(x[1]  not in ins_list and x[1] not in label_dict):
+            firstCount-=1
             var_dict[x[1]]=0
         else:
-            print("inavlid var name in line ", firstCount)
+
+            error_flag=1
+            varError=i+1
             break
             
             
@@ -247,9 +258,19 @@ for i in range(0,len(inp)):  #second pass
     x = own_split(x)
     print(x)
     count+=1
+    
     if(error_flag==1):
-        break
-    if(hlt_flag==0):
+        if(count==labelError):
+            out="invalid label name in line  "+ count
+            o_list.append(out)
+            break
+        elif(count==varError):
+            out="inavlid var name in line "+ count
+            o_list.append(out)
+            break
+
+           
+    if(hlt_flag==0):  #if we havent encountered hlt instruction yet
         
         if x[0][-1] == ":" :  #label
             ins_func(x[1:])
@@ -275,10 +296,11 @@ for i in range(0,len(inp)):  #second pass
             var_flag=1
             ins_func(x)
     else:
-        print("Error in line ",count,". Hlt instruction should be in end.")
+        print("Error in line ",count-1,". Hlt instruction should be in end.")
         break
        
-
+if(hlt!=1):
+    print("Error.Hlt instruction not found")
 fi.close()
         
            

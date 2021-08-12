@@ -140,9 +140,66 @@ def ls(x):
     out = "01001" + op_dict[x[1]] + bit_8
     o_list.append(out) 
     reg_dict["FLAGS"]="0000"
-
-
-
+    
+def cmp(x):
+    reg_dict["FLAGS"]=="0000"
+    if(reg_dict[x[1]]>reg_dict[x[2]]):
+        reg_dict["FLAGS"]=="0010"
+        bit_81=convertbin(int(x[1]))
+        out="01110"+
+    if(reg_dict[x[1]]<reg_dict[x[2]]):
+        reg_dict["FLAGS"]=="0100"
+        
+    if(reg_dict[x[1]]==reg_dict[x[2]]):
+        reg_dict["FLAGS"]=="0001"    
+def jmp(x):
+    reg_dict["FLAGS"]="0000"
+    temp_dict=dict(label_dict)
+    for sub in temp_dict:
+        if sub in label_dict:
+            temp_dict[sub]=label_dict[sub][0]
+    for sub in temp_dict:
+        if(x[1]==sub):
+            bit_8=convertbin(temp_dict[sub])
+            out="01111"+"000"+bit_8
+            
+    o_list.append(out)
+    
+def jlt(x):
+    if(reg_dict["FLAGS"]=="0100"):
+        temp_dict=dict(label_dict)
+        for sub in temp_dict:
+            if sub in label_dict:
+                temp_dict[sub]=label_dict[sub][0]
+        for sub in temp_dict:
+            if(x[1]==sub):
+                bit_8=convertbin(temp_dict[sub])
+                out="10000"+"000"+bit_8
+    o_list.append(out)
+    
+def jlt(x):
+    if(reg_dict["FLAGS"]=="0010"):
+        temp_dict=dict(label_dict)
+        for sub in temp_dict:
+            if sub in label_dict:
+                temp_dict[sub]=label_dict[sub][0]
+        for sub in temp_dict:
+            if(x[1]==sub):
+                bit_8=convertbin(temp_dict[sub])
+                out="10001"+"000"+bit_8
+    o_list.append(out)
+    
+def jlt(x):
+    if(reg_dict["FLAGS"]=="0001"):
+        temp_dict=dict(label_dict)
+        for sub in temp_dict:
+            if sub in label_dict:
+                temp_dict[sub]=label_dict[sub][0]
+        for sub in temp_dict:
+            if(x[1]==sub):
+                bit_8=convertbin(temp_dict[sub])
+                out="10010"+"000"+bit_8
+    o_list.append(out)    
 def ins_func(x):
     
     

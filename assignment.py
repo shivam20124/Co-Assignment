@@ -145,13 +145,21 @@ def cmp(x):
     reg_dict["FLAGS"]=="0000"
     if(reg_dict[x[1]]>reg_dict[x[2]]):
         reg_dict["FLAGS"]=="0010"
-        bit_81=convertbin(int(x[1]))
-        out="01110"+
+        bit_81=convertbin(reg_dict[(x[1])])
+        bit_82=convertbin(reg_dict[(x[2])])
+        out="01110"+"00000"+bit_81+bit_82
     if(reg_dict[x[1]]<reg_dict[x[2]]):
         reg_dict["FLAGS"]=="0100"
+        bit_81=convertbin(reg_dict[(x[1])])
+        bit_82=convertbin(reg_dict[(x[2])])
+        out="01110"+"00000"+bit_81+bit_82
         
     if(reg_dict[x[1]]==reg_dict[x[2]]):
-        reg_dict["FLAGS"]=="0001"    
+        reg_dict["FLAGS"]=="0001"
+        bit_81=convertbin(reg_dict[(x[1])])
+        bit_82=convertbin(reg_dict[(x[2])])
+        out="01110"+"00000"+bit_81+bit_82
+    o_list.append(out)    
 def jmp(x):
     reg_dict["FLAGS"]="0000"
     temp_dict=dict(label_dict)

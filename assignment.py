@@ -23,19 +23,50 @@ def convertbin(n):
     return out
 
 def mov(x):
-    if x[2][0] == "R":
+    if len(x) !=3:
+        global error_flag
+        error_flag = 1
+        out = "Invalid Syntax. Error in line" + str(count)
+        o_list.append(out)
+        return()
+    if (x[1] in reg_list) and (x[2] in reg_list):
         reg_dict[x[1]] = int(reg_dict[x[2]])
         out = "00011" + "00000" + op_dict[x[1]] + op_dict[x[2]]
         o_list.append(out)
-    else:
-        num = x[2][1:]
-        if (int(num) > 255 or int(num)<0):
-            print("Error in line ",count,". Immediate value not in [0,255]")
-            return
-        reg_dict[x[1]] = int(num)
-        bit_8 = convertbin(int(num))
-        out = "00010" + op_dict[x[1]] + bit_8
+        
+    elif (x[2] == "FLAGS") and (x[1] in reg_list):
+        out = "00011" + "0000" + op_dict[x[1]] + op_dict[x[2]]
         o_list.append(out)
+        
+    elif (x[2][0] == "$") and (x[1] in reg_list):
+        num = x[2][1:]
+        try:
+            num = int(num)
+        except:
+            global error_flag
+            error_flag = 1
+            out = "Invalid Immediate Value. Error in line" + str(count)
+            o_list.append(out)
+            return()
+        
+        if (num > 255) or (num < 0):
+            global error_flag
+            error_flag = 1
+            out = "Invalid Immediate Value. Error in line" + str(count)
+            o_list.append(out)
+            
+        else:
+            reg_dict[x[1]] = int(num)
+            bit_8 = convertbin(int(num))
+            out = "00010" + op_dict[x[1]] + bit_8
+            o_list.append(out)
+            
+    else:
+        global error_flag
+        error_flag = 1
+        out = "Invalid Syntax. Error in Line" + str(count)
+        o_list.append(out)
+        
 
 
 def add(x):
@@ -323,6 +354,7 @@ def ins_func(x):
 
 reg_dict = {"R0" : 0, "R1" : 0, "R2" : 0, "R3" : 0, "R4" : 0, "R5" :0, "R6" : 0, "FLAGS" : "0000"}
 op_dict = {"R0" : "000", "R1" : "001", "R2" : "010", "R3" : "011", "R4" : "100", "R5" : "101", "R6" : "110", "FLAGS" : "111"}
+reg_list = ["R0", "R1", "R2", "R3", "R4", "R5", "R6"]
 var_dict = {}
 label_dict={}
 ins_list=["add","sub","mov","ld","st","mul","div","rs","ls","xor","or","and","not","cmp","jmp","jlt","jgt","je","hlt"]

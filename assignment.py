@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Aug  9 16:20:18 2021
-
 @author: shiva
 """
+
+
 
 def own_split(x):
     lis = []
@@ -24,16 +25,19 @@ def convertbin(n):
 
 
 def check_3(x):
+    global error_flag
     if (len(x) !=4) or (x[1] not in reg_list) or (x[2] not in reg_list) or (x[3] not in reg_list):
-        global error_flag
+        
         error_flag = 1
+        
         out = "Invalid Syntax. Error in Line" + str(count)
         o_list.append(out)
         return(False)
 
 def mov(x):
+    global error_flag
     if len(x) !=3:
-        global error_flag
+        
         error_flag = 1
         out = "Invalid Syntax. Error in line" + str(count)
         o_list.append(out)
@@ -44,7 +48,7 @@ def mov(x):
         o_list.append(out)
         
     elif (x[2] == "FLAGS") and (x[1] in reg_list):
-        out = "00011" + "0000" + op_dict[x[1]] + op_dict[x[2]]
+        out = "00011" + "00000" + op_dict[x[1]] + op_dict[x[2]]
         o_list.append(out)
         
     elif (x[2][0] == "$") and (x[1] in reg_list):
@@ -52,14 +56,14 @@ def mov(x):
         try:
             num = int(num)
         except:
-            global error_flag
+            
             error_flag = 1
             out = "Invalid Immediate Value. Error in line" + str(count)
             o_list.append(out)
             return()
         
         if (num > 255) or (num < 0):
-            global error_flag
+            
             error_flag = 1
             out = "Invalid Immediate Value. Error in line" + str(count)
             o_list.append(out)
@@ -71,7 +75,7 @@ def mov(x):
             o_list.append(out)
             
     else:
-        global error_flag
+        
         error_flag = 1
         out = "Invalid Syntax. Error in Line" + str(count)
         o_list.append(out)
@@ -128,19 +132,21 @@ def mul(x):
 
 
 def div(x):
+    global error_flag
     if (len(x) !=3) or (x[1] not in reg_list) or (x[2] not in reg_list):
-        global error_flag
+       
         error_flag = 1
         out = "Invalid Syntax. Error in Line" + str(count)
         o_list.append(out)
         return()
-    quot = (reg_dict[x[1]])//(reg_dict[x[2]])
-    rem = (reg_dict[x[1]])%(reg_dict[x[2]])
-    reg_dict["R0"] = quot
-    reg_dict["R1"] = rem
-    out = "00111" + "00000" + op_dict[x[1]] + op_dict[x[2]]
-    o_list.append(out)
-    reg_dict["FLAGS"]="0000"
+    if (reg_dict[x[2]] != 0):
+        quot = (reg_dict[x[1]])//(reg_dict[x[2]])
+        rem = (reg_dict[x[1]])%(reg_dict[x[2]])
+        reg_dict["R0"] = quot
+        reg_dict["R1"] = rem
+        out = "00111" + "00000" + op_dict[x[1]] + op_dict[x[2]]
+        o_list.append(out)
+        reg_dict["FLAGS"]="0000"
 
 
 def or_r(x):
@@ -165,8 +171,9 @@ def and_r(x):
     reg_dict["FLAGS"]="0000"
 
 def not_r(x):
+    global error_flag
     if (len(x) !=3) or (x[1] not in reg_list) or (x[2] not in reg_list):
-        global error_flag
+        
         error_flag = 1
         out = "Invalid Syntax. Error in Line" + str(count)
         o_list.append(out)
@@ -179,8 +186,11 @@ def not_r(x):
 
 
 def xor(x):
+    
     if (check_3(x) == False):
+        
         return()
+    
     
     not_a = ~(reg_dict[x[2]])
     a = reg_dict[x[2]]
@@ -195,7 +205,7 @@ def xor(x):
 
 def rs(x):
     num = x[2][1:]
-    if (int(num)>255) | (int(num<0)):
+    if (int(num) > 255) or (int(num) < 0):
         out = "Error, imm out of range"
         
     else:
@@ -209,7 +219,7 @@ def rs(x):
 
 def ls(x):
     num = x[2][1:]
-    if (int(num)>255) | (int(num<0)):
+    if (int(num) > 255) or (int(num) < 0):
         out = "Error, imm out of range"
     else: 
         shifted = (reg_dict[x[1]])<<(int(num))
@@ -220,36 +230,39 @@ def ls(x):
     reg_dict["FLAGS"]="0000"
     
 def ld(x):
+    global error_flag
     if len(x)==3:
-        if(x[2] in var_dict) and x[1] in op_dict and x[1]!="FLAGS":
-            out="00100"+op_dict[x[1]]+convertbin(var_dict[x[2]])
+        if(x[2] in var_dict) and (x[1] in op_dict) and (x[1]!="FLAGS"):
+            out="00100"+ op_dict[x[1]] + convertbin(var_dict[x[2]])
             o_list.append(out)
         else:
-            global error_flag
-            error_flag=1
+           
+            error_flag = 1
             out="Error in line " + str(count)+" Memory address doesnt exist"
             o_list.append(out)
-            return()
+            
     else:
-        global error_flag
-        error_flag=1
+        
+        error_flag = 1
         out="Error in line "+str(count)+" Invalid syntax."
         o_list.append(out)
             
 
 def st(x):
+     global error_flag
      if len(x)==3:
-        if(x[2] in var_dict) and x[1] in op_dict and x[1]!="FLAGS":
+        if(x[2] in var_dict) and (x[1] in op_dict) and (x[1]!="FLAGS"):
+            
             out="00101"+op_dict[x[1]]+convertbin(var_dict[x[2]])
             o_list.append(out)
         else:
-            global error_flag
+            
             error_flag=1
             out="Error in line " + str(count)+" Memory address doesnt exist"
             o_list.append(out)
             return()
      else:
-        global error_flag
+        
         error_flag=1
         out="Error in line "+str(count)+" Invalid syntax."
         o_list.append(out)
@@ -259,8 +272,9 @@ def st(x):
             
     
 def cmp(x):
+    global error_flag
     if (len(x) !=3) or (x[1] not in reg_list) or (x[2] not in reg_list):
-        global error_flag
+        
         error_flag = 1
         out = "Invalid Syntax. Error in Line" + str(count)
         o_list.append(out)
@@ -279,6 +293,7 @@ def cmp(x):
     o_list.append(out)
         
 def jmp(x):
+    global error_flag
     reg_dict["FLAGS"]="0000"
     temp_dict=dict(label_dict)
     for i in temp_dict:
@@ -290,12 +305,13 @@ def jmp(x):
             out="01111"+"000"+bit_8        
             o_list.append(out)
             return()
-    out = "Error, no such label defined in line" + count
+    out = "Error, no such label defined in line" + str(count)
     o_list.append(out)
-    global error_flag
+    
     error_flag = 1
     
 def jlt(x):
+    global error_flag
     if(reg_dict["FLAGS"]=="0100"):
         temp_dict=dict(label_dict)
         for i in temp_dict:
@@ -306,9 +322,9 @@ def jlt(x):
                 bit_8=convertbin(temp_dict[i])
                 out="10000"+"000"+bit_8
                 o_list.append(out)
-        out = "Error, no such label defined in line" + count
+        out = "Error, no such label defined in line" + str(count)
         o_list.append(out)
-        global error_flag
+        
         error_flag = 1
     
 def jgt(x):
@@ -397,6 +413,12 @@ def ins_func(x):
         
     elif x[0] == "je":
         je(x)
+        
+    elif x[0] == "ld":
+        ld(x)
+        
+    elif x[0] == "st":
+        st(x)
 
 
 reg_dict = {"R0" : 0, "R1" : 0, "R2" : 0, "R3" : 0, "R4" : 0, "R5" :0, "R6" : 0, "FLAGS" : "0000"}
@@ -428,7 +450,7 @@ for i in range(0,len(inp)):  #firts pass
     x = inp[i].split(' ')
 
     x = own_split(x)
-    print(x[0])
+    
     firstCount+=1
     #firstAbsoluteCount+=1
     
@@ -474,10 +496,10 @@ for i in range(0,len(inp)):  #second pass
     x = own_split(x)
     
     count+=1
-    print(x[0])
+    
     if(error_flag==1):
         if(count==labelError):
-            out="invalid label name in line  "+ count
+            out="invalid label name in line  "+ str(count)
             o_list.append(out)
             break
         elif(count==varError):
@@ -504,6 +526,7 @@ for i in range(0,len(inp)):  #second pass
             
            
         elif(x[0] not in ins_list) :
+            print(x[0])
             var_flag=1
             out = "invalid instruction name in line " + str(count)
             o_list.append(out)
@@ -513,7 +536,7 @@ for i in range(0,len(inp)):  #second pass
             var_flag=1
             ins_func(x)
     else:
-        print("Error in line ",count-1,". Hlt instruction should be in end.")
+        print("Error in line ",str(count-1),". Hlt instruction should be in end.")
         break
     
     

@@ -149,15 +149,17 @@ def ls(x):
     
 def ld(x):
     if len(x)==3:
-        if(x[2] in var_dict):
+        if(x[2] in var_dict) and x[1] in op_dict and x[1]!="FLAGS":
             out="00100"+op_dict[x[1]]+convertbin(var_dict[x[2]])
             o_list.append(out)
         else:
+            global error_flag
             error_flag=1
             out="Error in line " + str(count)+" Memory address doesnt exist"
             o_list.append(out)
             break
      else:
+        global error_flag
         error_flag=1
         out="Error in line "+str(count)+" Invalid syntax."
         o_list.append(out)
@@ -165,15 +167,17 @@ def ld(x):
 
 def st(x):
      if len(x)==3:
-        if(x[2] in var_dict):
+        if(x[2] in var_dict) and x[1] in op_dict and x[1]!="FLAGS":
             out="00101"+op_dict[x[1]]+convertbin(var_dict[x[2]])
             o_list.append(out)
         else:
+            global error_flag
             error_flag=1
             out="Error in line " + str(count)+" Memory address doesnt exist"
             o_list.append(out)
             break
      else:
+        global error_flag
         error_flag=1
         out="Error in line "+str(count)+" Invalid syntax."
         o_list.append(out)

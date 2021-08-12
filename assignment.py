@@ -22,6 +22,15 @@ def convertbin(n):
     out = ("0")*(8-l) + y
     return out
 
+
+def check_3(x):
+    if (len(x) !=4) or (x[1] not in reg_list) or (x[2] not in reg_list) or (x[3] not in reg_list):
+        global error_flag
+        error_flag = 1
+        out = "Invalid Syntax. Error in Line" + str(count)
+        o_list.append(out)
+        return(False)
+
 def mov(x):
     if len(x) !=3:
         global error_flag
@@ -70,10 +79,13 @@ def mov(x):
 
 
 def add(x):
+    if (check_3(x) == False):
+        return()
     sum_reg = reg_dict[x[2]] + reg_dict[x[3]]
     if sum_reg > 65535:  # greatest 16 bit number
         reg_dict[x[1]]= 65535 & sum_reg
         reg_dict["FLAGS"]="1000"
+        
     else:
         reg_dict[x[1]] = sum_reg
         reg_dict["FLAGS"]="0000"
@@ -84,18 +96,25 @@ def add(x):
     
     
 def sub(x):
+    if (check_3(x) == False):
+        return()
     dif_reg = reg_dict[x[2]] - reg_dict[x[3]]    
     if dif_reg >=0:
         reg_dict[x[1]] = dif_reg
-        out = "00001" + "00" + op_dict[x[1]] + op_dict[x[2]] + op_dict[x[3]]
-        reg_dict["FLAGS"]="0000"
-        o_list.append(out)
+        reg_dict["FLAGS"]="0000" 
+        
     else:
         reg_dict[x[1]] = 0
         reg_dict["FLAGS"]="1000"
+        
+    out = "00001" + "00" + op_dict[x[1]] + op_dict[x[2]] + op_dict[x[3]]
+    o_list.append(out)
     
 
 def mul(x):
+    if (check_3(x) == False):
+        return()
+    
     pro_reg = (reg_dict[x[2]])*(reg_dict[x[3]]) 
     if pro_reg < 65535:
         reg_dict[x[1]] = pro_reg
@@ -109,6 +128,12 @@ def mul(x):
 
 
 def div(x):
+    if (len(x) !=3) or (x[1] not in reg_list) or (x[2] not in reg_list):
+        global error_flag
+        error_flag = 1
+        out = "Invalid Syntax. Error in Line" + str(count)
+        o_list.append(out)
+        return()
     quot = (reg_dict[x[1]])//(reg_dict[x[2]])
     rem = (reg_dict[x[1]])%(reg_dict[x[2]])
     reg_dict["R0"] = quot
@@ -119,6 +144,9 @@ def div(x):
 
 
 def or_r(x):
+    if (check_3(x) == False):
+        return()
+    
     or_reg = (reg_dict[x[2]])|(reg_dict[x[3]]) 
     reg_dict[x[1]] = or_reg
     out = "01011" + "00" + op_dict[x[1]] + op_dict[x[2]] + op_dict[x[3]]
@@ -127,6 +155,9 @@ def or_r(x):
     
     
 def and_r(x):
+    if (check_3(x) == False):
+        return()
+    
     and_reg = (reg_dict[x[2]])&(reg_dict[x[3]]) 
     reg_dict[x[1]] = and_reg
     out = "01100" + "00" + op_dict[x[1]] + op_dict[x[2]] + op_dict[x[3]]
@@ -134,6 +165,13 @@ def and_r(x):
     reg_dict["FLAGS"]="0000"
 
 def not_r(x):
+    if (len(x) !=3) or (x[1] not in reg_list) or (x[2] not in reg_list):
+        global error_flag
+        error_flag = 1
+        out = "Invalid Syntax. Error in Line" + str(count)
+        o_list.append(out)
+        return()
+    
     reg_dict[x[1]] = ~(reg_dict[x[2]])
     out = "01101" + "00000" + op_dict[x[1]] + op_dict[x[2]]
     o_list.append(out)
@@ -141,6 +179,9 @@ def not_r(x):
 
 
 def xor(x):
+    if (check_3(x) == False):
+        return()
+    
     not_a = ~(reg_dict[x[2]])
     a = reg_dict[x[2]]
     b = reg_dict[x[3]]
@@ -218,6 +259,12 @@ def st(x):
             
     
 def cmp(x):
+    if (len(x) !=3) or (x[1] not in reg_list) or (x[2] not in reg_list):
+        global error_flag
+        error_flag = 1
+        out = "Invalid Syntax. Error in Line" + str(count)
+        o_list.append(out)
+        return()
     
     if(reg_dict[x[1]]>reg_dict[x[2]]):
         reg_dict["FLAGS"] ="0010"

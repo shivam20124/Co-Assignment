@@ -40,7 +40,6 @@ def mov(x):
 
 def add(x):
     sum_reg = reg_dict[x[2]] + reg_dict[x[3]]
-    
     if sum_reg > 65535:  # greatest 16 bit number
         reg_dict[x[1]]= 65535 & sum_reg
         reg_dict["FLAGS"]="1000"
@@ -124,23 +123,100 @@ def xor(x):
 
 def rs(x):
     num = x[2][1:]
-    shifted = (reg_dict[x[1]])>>(int(num))
-    reg_dict[x[1]] = shifted
-    bit_8 = convertbin(int(num))
-    out = "01000" + op_dict[x[1]] + bit_8
+    if (int(num)>255) | (int(num<0)):
+        out = "Error, imm out of range"
+        
+    else:
+        shifted = (reg_dict[x[1]])>>(int(num))
+        reg_dict[x[1]] = shifted
+        bit_8 = convertbin(int(num))
+        out = "01000" + op_dict[x[1]] + bit_8
     o_list.append(out)
     reg_dict["FLAGS"]="0000"
 
 
 def ls(x):
     num = x[2][1:]
-    shifted = (reg_dict[x[1]])<<(int(num))
-    reg_dict[x[1]] = shifted
-    bit_8 = convertbin(int(num))
-    out = "01001" + op_dict[x[1]] + bit_8
+    if (int(num)>255) | (int(num<0)):
+        out = "Error, imm out of range"
+    else: 
+        shifted = (reg_dict[x[1]])<<(int(num))
+        reg_dict[x[1]] = shifted
+        bit_8 = convertbin(int(num))
+        out = "01001" + op_dict[x[1]] + bit_8
     o_list.append(out) 
     reg_dict["FLAGS"]="0000"
-
+    
+def cmp(x):
+    
+    if(reg_dict[x[1]]>reg_dict[x[2]]):
+        reg_dict["FLAGS"] ="0010"
+        
+    elif(reg_dict[x[1]]<reg_dict[x[2]]):
+        reg_dict["FLAGS"] ="0100"
+        
+    elif(reg_dict[x[1]] == reg_dict[x[2]]):
+        reg_dict["FLAGS"] ="0001"  
+        
+    out = "01110"+"00000" + op_dict[x[1]] + op_dict[x[2]]
+    o_list.append(out)
+        
+def jmp(x):
+    reg_dict["FLAGS"]="0000"
+    temp_dict=dict(label_dict)
+    for i in temp_dict:
+        if i in label_dict:
+            temp_dict[i]=label_dict[i][0]
+    for i in temp_dict:
+        if(x[1]==i):
+            bit_8=convertbin(temp_dict[i])
+            out="01111"+"000"+bit_8        
+            o_list.append(out)
+            return()
+    out = "Error, no such label defined in line" + count
+    o_list.append(out)
+    global error_flag
+    error_flag = 1
+    
+def jlt(x):
+    if(reg_dict["FLAGS"]=="0100"):
+        temp_dict=dict(label_dict)
+        for i in temp_dict:
+            if i in label_dict:
+                temp_dict[i]=label_dict[i][0]
+        for i in temp_dict:
+            if(x[1]==i):
+                bit_8=convertbin(temp_dict[i])
+                out="10000"+"000"+bit_8
+                o_list.append(out)
+        out = "Error, no such label defined in line" + count
+        o_list.append(out)
+        global error_flag
+        error_flag = 1
+    
+def jgt(x):
+    if(reg_dict["FLAGS"]=="0010"):
+        temp_dict=dict(label_dict)
+        for i in temp_dict:
+            if i in label_dict:
+                temp_dict[i]=label_dict[i][0]
+        for i in temp_dict:
+            if(x[1]==i):
+                bit_8=convertbin(temp_dict[i])
+                out="10001"+"000"+bit_8
+        o_list.append(out)
+    
+def je(x):
+    if(reg_dict["FLAGS"]=="0001"):
+        temp_dict=dict(label_dict)
+        for i in temp_dict:
+            if i in label_dict:
+                temp_dict[i]=label_dict[i][0]
+        for i in temp_dict:
+            if(x[1]==i):
+                bit_8=convertbin(temp_dict[i])
+                out="10010"+"000"+bit_8
+        o_list.append(out)    
 
 
 def ins_func(x):
@@ -189,6 +265,21 @@ def ins_func(x):
     elif x[0] == "ls":
         
         ls(x)
+    
+    elif x[0] == "cmp":
+        cmp(x)
+        
+    elif x[0] == "jmp":
+        jmp(x)
+        
+    elif x[0] == "jlt":
+        jlt(x)
+        
+    elif x[0] == "jgt":
+        jgt(x)
+        
+    elif x[0] == "je":
+        je(x)
 
 
 reg_dict = {"R0" : 0, "R1" : 0, "R2" : 0, "R3" : 0, "R4" : 0, "R5" :0, "R6" : 0, "FLAGS" : "0000"}
@@ -205,11 +296,12 @@ error_flag=0   #when a fucntion is returning some error
 
 o_list=[]
 fi = open('input.txt', 'r+')
-inp = fi.read()
-inp = inp.split('\n')
-for i in inp:
-    if(i==" "):
-        inp.remove(i)
+inpu = fi.read()
+inpu = inpu.split('\n')
+inp = []
+for i in inpu:
+    if(i!=""):
+        inp.append(i)
 
 for i in range(0,len(inp)):  #firts pass
     
@@ -218,7 +310,7 @@ for i in range(0,len(inp)):  #firts pass
     x = inp[i].split(' ')
 
     x = own_split(x)
-    print(x)
+    print(x[0])
     firstCount+=1
     #firstAbsoluteCount+=1
     
@@ -232,15 +324,21 @@ for i in range(0,len(inp)):  #firts pass
             break
             
     if(x[0]=="var"):
+        
+        if len(x) >1:
        
-        if(x[1]  not in ins_list and x[1] not in label_dict):
-            firstCount-=1
-            var_dict[x[1]]=0
+            if(x[1]  not in ins_list and x[1] not in label_dict):
+                firstCount-=1
+                var_dict[x[1]]=0
+            else:
+                error_flag=1
+                varError=i+1
+                break
         else:
-
-            error_flag=1
-            varError=i+1
+            error_flag = 1
+            varError = i+1
             break
+        
             
             
 for key in var_dict:
@@ -256,9 +354,9 @@ for i in range(0,len(inp)):  #second pass
     x = inp[i].split(' ')
 
     x = own_split(x)
-    print(x)
-    count+=1
     
+    count+=1
+    print(x[0])
     if(error_flag==1):
         if(count==labelError):
             out="invalid label name in line  "+ count
@@ -289,7 +387,8 @@ for i in range(0,len(inp)):  #second pass
            
         elif(x[0] not in ins_list) :
             var_flag=1
-            print("invalid instruction name in line ", count)
+            out = "invalid instruction name in line " + str(count)
+            o_list.append(out)
             break
     
         else:
@@ -298,20 +397,23 @@ for i in range(0,len(inp)):  #second pass
     else:
         print("Error in line ",count-1,". Hlt instruction should be in end.")
         break
-       
-if(hlt!=1):
-    print("Error.Hlt instruction not found")
-fi.close()
-        
-           
-           
-
-
+    
+    
+fi.close()     
 for i in range(0,len(o_list)):
-    print(o_list[i])
+    print(o_list[i])   
+if(hlt_flag!=1)and(error_flag!=1):
+    print("Error.Hlt instruction not found")
+
+        
+          
+           
+
+
+
 
 print(" ")
-print(var_list)
+
 print(" ")
 print(reg_dict)
 print(count)

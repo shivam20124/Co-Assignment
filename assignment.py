@@ -147,6 +147,41 @@ def ls(x):
     o_list.append(out) 
     reg_dict["FLAGS"]="0000"
     
+def ld(x):
+    if len(x)==3:
+        if(x[2] in var_dict):
+            out="00100"+op_dict[x[1]]+convertbin(var_dict[x[2]])
+            o_list.append(out)
+        else:
+            error_flag=1
+            out="Error in line " + str(count)+" Memory address doesnt exist"
+            o_list.append(out)
+            break
+     else:
+        error_flag=1
+        out="Error in line "+str(count)+" Invalid syntax."
+        o_list.append(out)
+        break
+
+def st(x):
+     if len(x)==3:
+        if(x[2] in var_dict):
+            out="00101"+op_dict[x[1]]+convertbin(var_dict[x[2]])
+            o_list.append(out)
+        else:
+            error_flag=1
+            out="Error in line " + str(count)+" Memory address doesnt exist"
+            o_list.append(out)
+            break
+     else:
+        error_flag=1
+        out="Error in line "+str(count)+" Invalid syntax."
+        o_list.append(out)
+        break
+
+    
+            
+    
 def cmp(x):
     
     if(reg_dict[x[1]]>reg_dict[x[2]]):

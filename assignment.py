@@ -229,13 +229,13 @@ def ld(x):
             error_flag=1
             out="Error in line " + str(count)+" Memory address doesnt exist"
             o_list.append(out)
-            break
-     else:
+            return()
+    else:
         global error_flag
         error_flag=1
         out="Error in line "+str(count)+" Invalid syntax."
         o_list.append(out)
-        break
+            
 
 def st(x):
      if len(x)==3:
@@ -247,13 +247,13 @@ def st(x):
             error_flag=1
             out="Error in line " + str(count)+" Memory address doesnt exist"
             o_list.append(out)
-            break
+            return()
      else:
         global error_flag
         error_flag=1
         out="Error in line "+str(count)+" Invalid syntax."
         o_list.append(out)
-        break
+        
 
     
             

@@ -7,11 +7,21 @@ Created on Mon Aug  9 16:20:18 2021
 
 
 def own_split(x):
+    x = x.split("\t")
     lis = []
-    for i in range(0, len(x)):
-        if x[i] != "":
-            lis.append(x[i])
-    return(lis)
+    
+    for i in range(0,len(x)):
+        a = x[i].split(' ')
+        lis.extend(a)
+    
+           
+           
+    ne_lis = []
+    for i in range(0, len(lis)):
+        if lis[i] != "":
+            ne_lis.append(lis[i])
+            
+    return(ne_lis)
   
 
 
@@ -26,10 +36,13 @@ def convertbin(n):
 
 def check_3(x):
     global error_flag
+    global synError
     if (len(x) !=4) or (x[1] not in reg_list) or (x[2] not in reg_list) or (x[3] not in reg_list):
         
         error_flag = 1
         
+        synError = count+1
+       
         out = "Invalid Syntax. Error in Line" + str(count)
         o_list.append(out)
         return(False)
@@ -48,6 +61,7 @@ def mov(x):
         o_list.append(out)
         
     elif (x[2] == "FLAGS") and (x[1] in reg_list):
+        reg_dict[x[1]] = int(reg_dict["FLAGS"])
         out = "00011" + "00000" + op_dict[x[1]] + op_dict[x[2]]
         o_list.append(out)
         
@@ -83,7 +97,9 @@ def mov(x):
 
 
 def add(x):
+    
     if (check_3(x) == False):
+        
         return()
     sum_reg = reg_dict[x[2]] + reg_dict[x[3]]
     if sum_reg > 65535:  # greatest 16 bit number
@@ -328,7 +344,7 @@ def jlt(x):
         error_flag = 1
     
 def jgt(x):
-    if(reg_dict["FLAGS"]=="0010"):
+    if(reg_dict["FLAGS"]!="0010"):
         temp_dict=dict(label_dict)
         for i in temp_dict:
             if i in label_dict:
@@ -337,7 +353,7 @@ def jgt(x):
             if(x[1]==i):
                 bit_8=convertbin(temp_dict[i])
                 out="10001"+"000"+bit_8
-        o_list.append(out)
+                o_list.append(out)
     
 def je(x):
     if(reg_dict["FLAGS"]=="0001"):
@@ -350,10 +366,21 @@ def je(x):
                 bit_8=convertbin(temp_dict[i])
                 out="10010"+"000"+bit_8
         o_list.append(out)    
+        
+def hlt(x):
+    global error_flag
+    if len(x) == 1:
+        out = "10011" + "00000000000"
+        o_list.append(out)
+    else:
+        error_flag = 1
+        out = "Invalid Syntax. Error on line" + str(count)
+        o_list.append(out)
 
 
 def ins_func(x):
-    
+    global error_flag
+    global synError
     
     if x[0] == "mov":
         
@@ -419,6 +446,16 @@ def ins_func(x):
         
     elif x[0] == "st":
         st(x)
+        
+    elif x[0] == "hlt":
+        hlt(x)
+        
+    else:
+        error_flag = 1
+        synError = count + 1
+        out = "Invalid Instruction Name in line " +str(count)
+        o_list.append(out)
+        return()
 
 
 reg_dict = {"R0" : 0, "R1" : 0, "R2" : 0, "R3" : 0, "R4" : 0, "R5" :0, "R6" : 0, "FLAGS" : "0000"}
@@ -428,6 +465,7 @@ var_dict = {}
 label_dict={}
 ins_list=["add","sub","mov","ld","st","mul","div","rs","ls","xor","or","and","not","cmp","jmp","jlt","jgt","je","hlt"]
 firstCount=-1
+synError = 0
 #firstAbsoluteCount=0
 count = 0
 var_flag=0 #var in beginning
@@ -447,7 +485,7 @@ for i in range(0,len(inp)):  #firts pass
     
     labelError=0
     varError=0
-    x = inp[i].split(' ')
+    x = inp[i]
 
     x = own_split(x)
     
@@ -491,33 +529,48 @@ for key in var_dict:
 for i in range(0,len(inp)):  #second pass
     
     
-    x = inp[i].split(' ')
-
+    x = inp[i]
+    
     x = own_split(x)
     
     count+=1
-    
+    #print("synError " + str(synError) + "  count " + str(count))
     if(error_flag==1):
-        if(count==labelError):
+        if (synError == count):
+            break
+        
+        elif(count==labelError):
             out="invalid label name in line  "+ str(count)
             o_list.append(out)
             break
+        
         elif(count==varError):
-            out="inavlid var name in line "+ count
+            out="inavlid var name in line "+ str(count)
             o_list.append(out)
             break
+        
+        
+            
 
            
     if(hlt_flag==0):  #if we havent encountered hlt instruction yet
         
         if x[0][-1] == ":" :  #label
+            if len(x) == 1:
+                error_flag = 1
+                
+                out = "Invalid Label Syntax in line " + str(count)
+                o_list.append(out)
+                break
             ins_func(x[1:])
             var_flag=1
        
     
         elif (x[0] == "var") :
             if(var_flag==1):
-                print("Error in line ",count,". Variables must be defined in beginning")
+                error_flag = 1
+                out = "Error in line " + str(count) + ". Variables must be defined in beginning"
+                o_list.append(out)
                 break
         
         elif(x[0]=="hlt"):
@@ -526,7 +579,7 @@ for i in range(0,len(inp)):  #second pass
             
            
         elif(x[0] not in ins_list) :
-            print(x[0])
+            error_flag = 1
             var_flag=1
             out = "invalid instruction name in line " + str(count)
             o_list.append(out)
@@ -545,11 +598,6 @@ for i in range(0,len(o_list)):
     print(o_list[i])   
 if(hlt_flag!=1)and(error_flag!=1):
     print("Error.Hlt instruction not found")
-
-        
-          
-           
-
 
 
 

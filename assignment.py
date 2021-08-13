@@ -49,11 +49,14 @@ def check_3(x):
 
 def mov(x):
     global error_flag
+    global synError
     if len(x) !=3:
         
         error_flag = 1
+        synError = count+1
         out = "Invalid Syntax. Error in line" + str(count)
         o_list.append(out)
+        reg_dict["FLAGS"]="0000"
         return()
     if (x[1] in reg_list) and (x[2] in reg_list):
         reg_dict[x[1]] = int(reg_dict[x[2]])
@@ -70,14 +73,15 @@ def mov(x):
         try:
             num = int(num)
         except:
-            
+            synError = count+1
             error_flag = 1
             out = "Invalid Immediate Value. Error in line" + str(count)
             o_list.append(out)
+            reg_dict["FLAGS"]="0000"
             return()
         
         if (num > 255) or (num < 0):
-            
+            synError = count+1
             error_flag = 1
             out = "Invalid Immediate Value. Error in line" + str(count)
             o_list.append(out)
@@ -89,11 +93,11 @@ def mov(x):
             o_list.append(out)
             
     else:
-        
+        synError = count+1
         error_flag = 1
         out = "Invalid Syntax. Error in Line" + str(count)
         o_list.append(out)
-        
+    reg_dict["FLAGS"]="0000"
 
 
 def add(x):
@@ -148,9 +152,11 @@ def mul(x):
 
 
 def div(x):
+    reg_dict["FLAGS"]="0000"
     global error_flag
+    global synError
     if (len(x) !=3) or (x[1] not in reg_list) or (x[2] not in reg_list):
-       
+        synError = count+1
         error_flag = 1
         out = "Invalid Syntax. Error in Line" + str(count)
         o_list.append(out)
@@ -162,10 +168,11 @@ def div(x):
         reg_dict["R1"] = rem
         out = "00111" + "00000" + op_dict[x[1]] + op_dict[x[2]]
         o_list.append(out)
-        reg_dict["FLAGS"]="0000"
+       
 
 
 def or_r(x):
+    reg_dict["FLAGS"]="0000"
     if (check_3(x) == False):
         return()
     
@@ -173,10 +180,11 @@ def or_r(x):
     reg_dict[x[1]] = or_reg
     out = "01011" + "00" + op_dict[x[1]] + op_dict[x[2]] + op_dict[x[3]]
     o_list.append(out)
-    reg_dict["FLAGS"]="0000"
+   
     
     
 def and_r(x):
+    reg_dict["FLAGS"]="0000"
     if (check_3(x) == False):
         return()
     
@@ -184,12 +192,14 @@ def and_r(x):
     reg_dict[x[1]] = and_reg
     out = "01100" + "00" + op_dict[x[1]] + op_dict[x[2]] + op_dict[x[3]]
     o_list.append(out)
-    reg_dict["FLAGS"]="0000"
+   
 
 def not_r(x):
     global error_flag
+    global synError
+    reg_dict["FLAGS"]="0000"
     if (len(x) !=3) or (x[1] not in reg_list) or (x[2] not in reg_list):
-        
+        synError = count+1
         error_flag = 1
         out = "Invalid Syntax. Error in Line" + str(count)
         o_list.append(out)
@@ -198,10 +208,11 @@ def not_r(x):
     reg_dict[x[1]] = ~(reg_dict[x[2]])
     out = "01101" + "00000" + op_dict[x[1]] + op_dict[x[2]]
     o_list.append(out)
-    reg_dict["FLAGS"]="0000"
+  
 
 
 def xor(x):
+    reg_dict["FLAGS"]="0000"
     
     if (check_3(x) == False):
         
@@ -216,37 +227,89 @@ def xor(x):
     reg_dict[x[1]] = xor_reg
     out = "01010" + "00" + op_dict[x[1]] + op_dict[x[2]] + op_dict[x[3]]
     o_list.append(out)
-    reg_dict["FLAGS"]="0000"
-
+ 
 
 def rs(x):
-    num = x[2][1:]
-    if (int(num) > 255) or (int(num) < 0):
-        out = "Error, imm out of range"
-        
-    else:
-        shifted = (reg_dict[x[1]])>>(int(num))
-        reg_dict[x[1]] = shifted
-        bit_8 = convertbin(int(num))
-        out = "01000" + op_dict[x[1]] + bit_8
-    o_list.append(out)
+    global error_flag
+    global synError
     reg_dict["FLAGS"]="0000"
+    if len(x)==3 and (x[2][0] == "$") and (x[1] in reg_list):
+        num = x[2][1:]
+        try:
+            num = int(num)
+        except:
+            synError = count+1
+            error_flag = 1
+            out = "Invalid Immediate Value. Error in line" + str(count)
+            o_list.append(out)
+            return()
+        
+        if (num > 255) or (num < 0):
+            synError = count+1
+            error_flag = 1
+            out = "Invalid Immediate Value. Error in line" + str(count)
+            o_list.append(out)
+            
+        else:
+            shifted = (reg_dict[x[1]])>>(int(num))
+            reg_dict[x[1]] = shifted
+            bit_8 = convertbin(int(num))
+            out = "01000" + op_dict[x[1]] + bit_8
+     else:
+        synError = count+1
+        error_flag = 1
+        out = "Invalid instruction format. Error in line" + str(count)
+        o_list.append(out)
+        
+     
+   
+  
+  
 
 
 def ls(x):
-    num = x[2][1:]
-    if (int(num) > 255) or (int(num) < 0):
-        out = "Error, imm out of range"
-    else: 
-        shifted = (reg_dict[x[1]])<<(int(num))
-        reg_dict[x[1]] = shifted
-        bit_8 = convertbin(int(num))
-        out = "01001" + op_dict[x[1]] + bit_8
-    o_list.append(out) 
+    global error_flag
+    global synError
     reg_dict["FLAGS"]="0000"
+    if len(x)==3 and (x[2][0] == "$") and (x[1] in reg_list):
+        num = x[2][1:]
+        try:
+            num = int(num)
+        except:
+            synError = count+1
+            error_flag = 1
+            out = "Invalid Immediate Value. Error in line" + str(count)
+            o_list.append(out)
+            return()
+        
+        if (num > 255) or (num < 0):
+            synError = count+1
+            error_flag = 1
+            out = "Invalid Immediate Value. Error in line" + str(count)
+            o_list.append(out)
+            
+        else:
+            shifted = (reg_dict[x[1]])<<(int(num))
+            reg_dict[x[1]] = shifted
+            bit_8 = convertbin(int(num))
+            out = "01001" + op_dict[x[1]] + bit_8
+     else:
+        synError = count+1
+        error_flag = 1
+        out = "Invalid instruction format. Error in line" + str(count)
+        o_list.append(out)
+  
+   
+  
+    
+    
+    
+   
     
 def ld(x):
     global error_flag
+    global synError
+    reg_dict["FLAGS"]="0000"
     if len(x)==3:
         if(x[2] in var_dict) and (x[1] in op_dict) and (x[1]!="FLAGS"):
             out="00100"+ op_dict[x[1]] + convertbin(var_dict[x[2]])
@@ -254,18 +317,22 @@ def ld(x):
         else:
            
             error_flag = 1
+            synError = count+1
             out="Error in line " + str(count)+" Memory address doesnt exist"
             o_list.append(out)
             
     else:
         
         error_flag = 1
+        synError = count+1
         out="Error in line "+str(count)+" Invalid syntax."
         o_list.append(out)
             
 
 def st(x):
      global error_flag
+     global synError
+     reg_dict["FLAGS"]="0000"
      if len(x)==3:
         if(x[2] in var_dict) and (x[1] in op_dict) and (x[1]!="FLAGS"):
             
@@ -274,12 +341,14 @@ def st(x):
         else:
             
             error_flag=1
+            synError = count+1
             out="Error in line " + str(count)+" Memory address doesnt exist"
             o_list.append(out)
             return()
      else:
         
         error_flag=1
+        synError = count+1
         out="Error in line "+str(count)+" Invalid syntax."
         o_list.append(out)
         
@@ -289,12 +358,15 @@ def st(x):
     
 def cmp(x):
     global error_flag
+    global synError
     if (len(x) !=3) or (x[1] not in reg_list) or (x[2] not in reg_list):
         
         error_flag = 1
+        synError = count+1
         out = "Invalid Syntax. Error in Line" + str(count)
         o_list.append(out)
         return()
+        
     
     if(reg_dict[x[1]]>reg_dict[x[2]]):
         reg_dict["FLAGS"] ="0010"
@@ -310,7 +382,16 @@ def cmp(x):
         
 def jmp(x):
     global error_flag
+    global synError
     reg_dict["FLAGS"]="0000"
+
+    if(len(x)!=2):
+        out="Invalid instruction format. Error in line " + str(count)
+        error_flag = 1
+        synError = count+1
+        o_list.append(out)
+        return()
+   
     temp_dict=dict(label_dict)
     for i in temp_dict:
         if i in label_dict:
@@ -321,14 +402,18 @@ def jmp(x):
             out="01111"+"000"+bit_8        
             o_list.append(out)
             return()
-    out = "Error, no such label defined in line" + str(count)
-    o_list.append(out)
+        else:
+            error_flag = 1
+            synError = count+1
+            out = "Error, no such label defined in line" + str(count)
+            o_list.append(out)
     
-    error_flag = 1
+   
     
 def jlt(x):
     global error_flag
-    if(reg_dict["FLAGS"]=="0100"):
+    global synError
+    if(len(x)==2):
         temp_dict=dict(label_dict)
         for i in temp_dict:
             if i in label_dict:
@@ -338,13 +423,26 @@ def jlt(x):
                 bit_8=convertbin(temp_dict[i])
                 out="10000"+"000"+bit_8
                 o_list.append(out)
-        out = "Error, no such label defined in line" + str(count)
-        o_list.append(out)
+            else:
+                error_flag = 1
+                synError = count+1
+                out = "Error, no such label defined in line" + str(count)
+                o_list.append(out)
+     else:
         
         error_flag = 1
+        synError = count+1
+        out = "Error, no such label defined in line" + str(count)
+        o_list.append(out)
+     reg_dict["FLAGS"]="0000"
+     
+        
+   
     
 def jgt(x):
-    if(reg_dict["FLAGS"]!="0010"):
+    global error_flag
+    global synError
+    if(len(x)==2):
         temp_dict=dict(label_dict)
         for i in temp_dict:
             if i in label_dict:
@@ -354,9 +452,24 @@ def jgt(x):
                 bit_8=convertbin(temp_dict[i])
                 out="10001"+"000"+bit_8
                 o_list.append(out)
+            else:
+                error_flag = 1
+                synError = count+1
+                out = "Error, no such label defined in line" + str(count)
+                o_list.append(out)
+     else:
+        
+        error_flag = 1
+        synError = count+1
+        out = "Error, no such label defined in line" + str(count)
+        o_list.append(out)
+     reg_dict["FLAGS"]="0000"
+
     
 def je(x):
-    if(reg_dict["FLAGS"]=="0001"):
+    global error_flag
+    global synError
+    if(len(x)==2):
         temp_dict=dict(label_dict)
         for i in temp_dict:
             if i in label_dict:
@@ -365,17 +478,32 @@ def je(x):
             if(x[1]==i):
                 bit_8=convertbin(temp_dict[i])
                 out="10010"+"000"+bit_8
-        o_list.append(out)    
+                o_list.append(out)    
+            else:
+                error_flag = 1
+                synError = count+1
+                out = "Error, no such label defined in line" + str(count)
+                o_list.append(out)
+     else:
+        
+        error_flag = 1
+        synError = count+1
+        out = "Error, no such label defined in line" + str(count)
+        o_list.append(out)
+     reg_dict["FLAGS"]="0000"
         
 def hlt(x):
     global error_flag
+    global synError
     if len(x) == 1:
         out = "10011" + "00000000000"
         o_list.append(out)
     else:
         error_flag = 1
+        synError = count+1
         out = "Invalid Syntax. Error on line" + str(count)
         o_list.append(out)
+     reg_dict["FLAGS"]="0000"
 
 
 def ins_func(x):

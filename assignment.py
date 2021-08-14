@@ -607,13 +607,16 @@ for line in stdin:
     if line == '':
         break
     else:
-        
-        inpu.append(line.split())
-        
+        line=line.split()
+        for i in range(len(line)):
+            line[i].strip()
+        inpu.append(line)
+# print(inpu)        
 inp = []
 for i in inpu:
     if(i!=""):
-        inp.append(i)
+        inp.append(i)        
+
 
 for i in range(0,len(inp)):  #firts pass
     
@@ -621,7 +624,7 @@ for i in range(0,len(inp)):  #firts pass
     varError=0
     x = inp[i]
 
-    x = own_split(x)
+    
     
     firstCount+=1
     #firstAbsoluteCount+=1
@@ -665,7 +668,7 @@ for i in range(0,len(inp)):  #second pass
     
     x = inp[i]
     
-    x = own_split(x)
+    
     
     count+=1
     #print("synError " + str(synError) + "  count " + str(count))
@@ -708,8 +711,11 @@ for i in range(0,len(inp)):  #second pass
                 break
         
         elif(x[0]=="hlt"):
+            out = "10011" + "00000000000"
+            o_list.append(out)
             var_flag=1
             hlt_flag=1
+
             
            
         elif(x[0] not in ins_list) :

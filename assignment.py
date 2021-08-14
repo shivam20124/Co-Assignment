@@ -3,7 +3,7 @@
 Created on Mon Aug  9 16:20:18 2021
 @author: shiva
 """
-
+from sys import stdin
 
 
 def own_split(x):
@@ -255,7 +255,7 @@ def rs(x):
             reg_dict[x[1]] = shifted
             bit_8 = convertbin(int(num))
             out = "01000" + op_dict[x[1]] + bit_8
-     else:
+    else:
         synError = count+1
         error_flag = 1
         out = "Invalid instruction format. Error in line" + str(count)
@@ -293,7 +293,7 @@ def ls(x):
             reg_dict[x[1]] = shifted
             bit_8 = convertbin(int(num))
             out = "01001" + op_dict[x[1]] + bit_8
-     else:
+    else:
         synError = count+1
         error_flag = 1
         out = "Invalid instruction format. Error in line" + str(count)
@@ -428,13 +428,13 @@ def jlt(x):
                 synError = count+1
                 out = "Error, no such label defined in line" + str(count)
                 o_list.append(out)
-     else:
+    else:
         
         error_flag = 1
         synError = count+1
         out = "Error, no such label defined in line" + str(count)
         o_list.append(out)
-     reg_dict["FLAGS"]="0000"
+    reg_dict["FLAGS"]="0000"
      
         
    
@@ -457,13 +457,13 @@ def jgt(x):
                 synError = count+1
                 out = "Error, no such label defined in line" + str(count)
                 o_list.append(out)
-     else:
+    else:
         
         error_flag = 1
         synError = count+1
         out = "Error, no such label defined in line" + str(count)
         o_list.append(out)
-     reg_dict["FLAGS"]="0000"
+    reg_dict["FLAGS"]="0000"
 
     
 def je(x):
@@ -484,13 +484,13 @@ def je(x):
                 synError = count+1
                 out = "Error, no such label defined in line" + str(count)
                 o_list.append(out)
-     else:
+    else:
         
         error_flag = 1
         synError = count+1
         out = "Error, no such label defined in line" + str(count)
         o_list.append(out)
-     reg_dict["FLAGS"]="0000"
+    reg_dict["FLAGS"]="0000"
         
 def hlt(x):
     global error_flag
@@ -503,7 +503,7 @@ def hlt(x):
         synError = count+1
         out = "Invalid Syntax. Error on line" + str(count)
         o_list.append(out)
-     reg_dict["FLAGS"]="0000"
+    reg_dict["FLAGS"]="0000"
 
 
 def ins_func(x):
@@ -601,9 +601,15 @@ hlt_flag=0 #hlt in end
 error_flag=0   #when a fucntion is returning some error
 
 o_list=[]
-fi = open('input.txt', 'r+')
-inpu = fi.read()
-inpu = inpu.split('\n')
+inpu = []
+
+for line in stdin:
+    if line == '':
+        break
+    else:
+        
+        inpu.append(line.split())
+        
 inp = []
 for i in inpu:
     if(i!=""):
@@ -721,16 +727,22 @@ for i in range(0,len(inp)):  #second pass
         break
     
     
-fi.close()     
-for i in range(0,len(o_list)):
-    print(o_list[i])   
+ 
+#for i in range(0,len(o_list)):
+    #print(o_list[i])   
+    
+for line in o_list:
+    print(line)    
+    
 if(hlt_flag!=1)and(error_flag!=1):
     print("Error.Hlt instruction not found")
 
 
 
-print(" ")
 
-print(" ")
-print(reg_dict)
-print(count)
+
+"""
+fi = open('input.txt', 'r+')
+inpu = fi.read()
+inpu = inpu.split('\n')
+"""

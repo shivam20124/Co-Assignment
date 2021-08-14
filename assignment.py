@@ -494,8 +494,10 @@ def je(x):
         
 def hlt(x):
     global error_flag
+    global hlt_flag
     global synError
     if len(x) == 1:
+        hlt_flag = 1
         out = "10011" + "00000000000"
         o_list.append(out)
     else:

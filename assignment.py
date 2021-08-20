@@ -237,24 +237,29 @@ def rs(x):
         num = x[2][1:]
         try:
             num = int(num)
+            
         except:
             synError = count+1
+            
             error_flag = 1
             out = "Invalid Immediate Value. Error in line" + str(count)
             o_list.append(out)
             return()
         
         if (num > 255) or (num < 0):
+            
             synError = count+1
             error_flag = 1
             out = "Invalid Immediate Value. Error in line" + str(count)
             o_list.append(out)
             
         else:
+            
             shifted = (reg_dict[x[1]])>>(int(num))
             reg_dict[x[1]] = shifted
             bit_8 = convertbin(int(num))
             out = "01000" + op_dict[x[1]] + bit_8
+            o_list.append(out)
     else:
         synError = count+1
         error_flag = 1
@@ -293,6 +298,7 @@ def ls(x):
             reg_dict[x[1]] = shifted
             bit_8 = convertbin(int(num))
             out = "01001" + op_dict[x[1]] + bit_8
+            o_list.append(out)
     else:
         synError = count+1
         error_flag = 1
@@ -605,6 +611,10 @@ error_flag=0   #when a fucntion is returning some error
 o_list=[]
 inpu = []
 
+
+
+
+
 for line in stdin:
     if line == '':
         break
@@ -613,7 +623,8 @@ for line in stdin:
         for i in range(len(line)):
             line[i].strip()
         inpu.append(line)
-# print(inpu)        
+# print(inpu)   
+   
 inp = []
 for i in inpu:
     if(i!=""):
@@ -625,7 +636,8 @@ for i in range(0,len(inp)):  #firts pass
     labelError=0
     varError=0
     x = inp[i]
-
+    
+    #x = own_split(x)
     
     
     firstCount+=1
@@ -668,9 +680,11 @@ for key in var_dict:
 for i in range(0,len(inp)):  #second pass
     
     
+    
+    
+    
     x = inp[i]
-    
-    
+    #x = own_split(x)
     
     count+=1
     #print("synError " + str(synError) + "  count " + str(count))
@@ -734,7 +748,7 @@ for i in range(0,len(inp)):  #second pass
         print("Error in line ",str(count-1),". Hlt instruction should be in end.")
         break
     
-    
+#fi.close()
  
 #for i in range(0,len(o_list)):
     #print(o_list[i])   
@@ -745,12 +759,12 @@ for line in o_list:
 if(hlt_flag!=1)and(error_flag!=1):
     print("Error.Hlt instruction not found")
 
-
-
-
-
 """
 fi = open('input.txt', 'r+')
 inpu = fi.read()
 inpu = inpu.split('\n')
 """
+
+
+
+

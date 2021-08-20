@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Thu Aug 19 23:47:12 2021
+
+@author: shiva
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Wed Aug 18 20:53:39 2021
 @author: AKSHITA
 """
@@ -70,11 +77,41 @@ def jmp(s):
     mem_add=int(s[8:],2)
     pc=mem_add
     reg_file[7]=0  
+
+def jgt(s):
+    global pc
+    if(reg_file[7]==2):
+        mem_add=int(s[8:],2)
+        pc=mem_add 
+        
+    else :
+        pc+=1    
+    reg_file[7]=0
+         
     
+def jlt(s):
+    global pc
+    if(reg_file[7]==4):
+        mem_add=int(s[8:],2)
+        pc=mem_add 
+    else:
+        pc+=1
+    reg_file[7]=0
+    
+
+def je(s):
+    global pc
+    if(reg_file[7]==1):
+        mem_add=int(s[8:],2)
+        pc=mem_add  
+    else:
+        pc+=1
+    reg_file[7]=0
+
 def add(s):
-    r_sto = int(s[7:10])
-    r_1 = int(s[10:13])
-    r_2 = int(s[13:16])
+    r_sto = int(s[7:10],2)
+    r_1 = int(s[10:13],2)
+    r_2 = int(s[13:16],2)
     sum_reg = reg_file[r_1] + reg_file[r_2]
     if sum_reg < 65535:
         reg_file[r_sto] = sum_reg
@@ -88,11 +125,11 @@ def add(s):
     
     
 def sub(s):
-    r_sto = int(s[7:10])
-    r_1 = int(s[10:13])
-    r_2 = int(s[13:16])
+    r_sto = int(s[7:10],2)
+    r_1 = int(s[10:13],2)
+    r_2 = int(s[13:16],2)
     sub_reg = reg_file[r_1] - reg_file[r_2]
-    if sub_reg > 0:
+    if sub_reg >= 0:
         reg_file[r_sto] = sub_reg
         reg_file[7] = 0
     else:
@@ -103,8 +140,8 @@ def sub(s):
     
     
 def mov_im(s):
-    r_sto = int(s[5:8])
-    imm = int(s[8:16])
+    r_sto = int(s[5:8],2)
+    imm = int(s[8:16],2)
     reg_file[r_sto] = imm
     global pc
     pc +=1
@@ -112,8 +149,8 @@ def mov_im(s):
   
     
 def mov_reg(s):
-    r_sto = int(s[10:13])
-    r_1 = int(s[13:16])
+    r_sto = int(s[10:13],2)
+    r_1 = int(s[13:16],2)
     reg_file[r_sto] = reg_file[r_1]
     global pc
     pc +=1
@@ -121,9 +158,9 @@ def mov_reg(s):
     
     
 def mul(s):
-    r_sto = int(s[7:10])
-    r_1 = int(s[10:13])
-    r_2 = int(s[13:16])
+    r_sto = int(s[7:10],2)
+    r_1 = int(s[10:13],2)
+    r_2 = int(s[13:16],2)
     pro_reg = reg_file[r_1] * reg_file[r_2]
     if pro_reg < 65535:
         reg_file[r_sto] = pro_reg
@@ -136,8 +173,8 @@ def mul(s):
     pc +=1
     
 def div(s):
-    r_1 = int(s[10:13])
-    r_2 = int(s[13:16])
+    r_1 = int(s[10:13],2)
+    r_2 = int(s[13:16],2)
     reg_file[0] = (reg_file[r_1])//(reg_file[r_2])
     reg_file[1] = (reg_file[r_1])%(reg_file[r_2])
     global pc
@@ -145,9 +182,9 @@ def div(s):
     reg_file[7] = 0
     
 def Or(s):
-    r_sto = int(s[7:10])
-    r_1 = int(s[10:13])
-    r_2 = int(s[13:16])
+    r_sto = int(s[7:10],2)
+    r_1 = int(s[10:13],2)
+    r_2 = int(s[13:16],2)
     or_reg = (reg_file[r_1])|(reg_file[r_2])
     reg_file[r_sto] = or_reg
     global pc
@@ -155,9 +192,9 @@ def Or(s):
     reg_file[7] = 0
     
 def And(s):
-    r_sto = int(s[7:10])
-    r_1 = int(s[10:13])
-    r_2 = int(s[13:16])
+    r_sto = int(s[7:10],2)
+    r_1 = int(s[10:13],2)
+    r_2 = int(s[13:16],2)
     and_reg = (reg_file[r_1])&(reg_file[r_2])
     reg_file[r_sto] = and_reg
     global pc
@@ -165,8 +202,8 @@ def And(s):
     reg_file[7] = 0
     
 def invert(s):
-    r_sto = int(s[10:13])
-    r_1 = int(s[13:16])
+    r_sto = int(s[10:13],2)
+    r_1 = int(s[13:16],2)
     not_reg = ~(reg_file[r_1])
     reg_file[r_sto] = not_reg
     global pc
@@ -174,11 +211,11 @@ def invert(s):
     reg_file[7] = 0
     
 def xor(s):
-    r_sto = int(s[7:10])
-    r_1 = int(s[10:13])
+    r_sto = int(s[7:10],2)
+    r_1 = int(s[10:13],2)
     r1_val = reg_file[r_1]
     not_r1 = ~(r1_val)
-    r_2 = int(s[13:16])
+    r_2 = int(s[13:16],2)
     r2_val = reg_file[r_2]
     not_r2 = ~(r2_val)
     xor_reg = ((r1_val)&(not_r2))|((not_r1)&r2_val)
@@ -186,6 +223,12 @@ def xor(s):
     global pc
     pc +=1
     reg_file[7] = 0
+
+def hlt(s):
+    global pc
+    pc+=1
+    global halt
+    halt=True    
     
     
 

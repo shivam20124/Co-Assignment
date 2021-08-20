@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Aug 19 23:47:12 2021
-
-@author: shiva
-"""
 
 # -*- coding: utf-8 -*-
 """
@@ -43,7 +37,7 @@ def store(s):
 def rs(s):
     reg=int(s[5:8],2)
     imm=int(s[8:],2)
-    reg_file[reg]=reg_file>>imm
+    reg_file[reg]=reg_file[reg]>>imm
     global pc
     pc+=1
     reg_file[7]=0
@@ -52,7 +46,7 @@ def rs(s):
 def ls(s):
     reg=int(s[5:8],2)
     imm=int(s[8:],2)
-    reg_file[reg]=reg_file<<imm
+    reg_file[reg]=reg_file[reg]<<imm
     global pc
     pc+=1
     reg_file[7]=0
@@ -204,7 +198,20 @@ def And(s):
 def invert(s):
     r_sto = int(s[10:13],2)
     r_1 = int(s[13:16],2)
-    not_reg = ~(reg_file[r_1])
+    x = reg_file[r_1]
+    not_reg = ~x
+    """
+    x = bin(x)
+    x = x[2:]
+    not_x = ""
+    for i in range(0, len(x)):
+        if x[i] == "0":
+            not_x = not_x + "1"
+        else:
+            not_x = not_x + "0"
+    
+    not_reg = int(not_x,2)
+    """
     reg_file[r_sto] = not_reg
     global pc
     pc +=1
@@ -246,30 +253,45 @@ op_dict={"00000":add,"00001":sub,"00010":mov_im,
     
 def convertBin(n,b):
     y=bin(n)
-    y=y[2:]
+    if y[0] == "-":
+        y = y[3:]
+    else:
+        y=y[2:]
     l=len(y)
     y="0"*(b-l)+ str(y)
     return y
     
 
 
-    
-    
+"""
+fi = open('input.txt', 'r+')
+ins_list = fi.read()
+ins_list = ins_list.split('\n')
+"""    
+
+
 for line in stdin:
     ins_list.append(line)
+
+
+
     
 for i in range(0,len(ins_list)):
     mem[i]=ins_list[i]
     
-
+count = 1
 while(halt==False):
     curr_ins=mem[pc]
-    print(convertBin(pc,8),end=" ")
+    print(convertBin(pc,8),count, end=" ")
     op_dict[curr_ins[0:5]](curr_ins)
+    count +=1
     for i in reg_file:
         print(convertBin(i,16),end=" ")
     print("\n")
    
-
+"""
 for i in mem:
     print(i)
+    """
+
+#fi.close()

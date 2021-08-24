@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 """
 Created on Wed Aug 18 20:53:39 2021
@@ -199,10 +198,12 @@ def invert(s):
     r_sto = int(s[10:13],2)
     r_1 = int(s[13:16],2)
     x = reg_file[r_1]
-    not_reg = ~x
+    #not_reg = ~x
     """
     x = bin(x)
     x = x[2:]
+    l = len(x)
+    x = "0"*(16-l) + x
     not_x = ""
     for i in range(0, len(x)):
         if x[i] == "0":
@@ -212,6 +213,7 @@ def invert(s):
     
     not_reg = int(not_x,2)
     """
+    not_reg = 65535-x
     reg_file[r_sto] = not_reg
     global pc
     pc +=1
@@ -221,10 +223,10 @@ def xor(s):
     r_sto = int(s[7:10],2)
     r_1 = int(s[10:13],2)
     r1_val = reg_file[r_1]
-    not_r1 = ~(r1_val)
+    not_r1 = 65535 - r1_val
     r_2 = int(s[13:16],2)
     r2_val = reg_file[r_2]
-    not_r2 = ~(r2_val)
+    not_r2 = 65535 - r2_val
     xor_reg = ((r1_val)&(not_r2))|((not_r1)&r2_val)
     reg_file[r_sto] = xor_reg
     global pc

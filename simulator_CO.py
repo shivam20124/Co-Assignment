@@ -4,6 +4,8 @@ Created on Wed Aug 18 20:53:39 2021
 @author: AKSHITA
 """
 from sys import stdin
+import matplotlib.pyplot as plt
+import numpy as np
 
 mem=['0000000000000000']*256 #initialising memory
 
@@ -11,6 +13,9 @@ pc=0
 reg_file=[0]*8
 halt=False
 ins_list=[]
+x_arr=[]
+y_arr=[]
+cycle=0
 
             
 
@@ -22,6 +27,8 @@ def load(s):
     global pc
     pc+=1
     reg_file[7]=0
+    x_arr.append(cycle)
+    y_arr.append(mem_add)
 
 def store(s):
     reg=int(s[5:8],2)
@@ -30,7 +37,9 @@ def store(s):
     mem[mem_add]=val
     global pc
     pc+=1
-    reg_file[7]=0    
+    reg_file[7]=0 
+    x_arr.append(cycle)
+    y_arr.append(mem_add)
 
 
 def rs(s):
@@ -265,11 +274,11 @@ def convertBin(n,b):
     
 
 
-"""
-fi = open('input.txt', 'r+')
-ins_list = fi.read()
-ins_list = ins_list.split('\n')
-"""    
+
+# fi = open('co.txt', 'r+')
+# ins_list = fi.read()
+# ins_list = ins_list.split('\n')
+   
 
 
 for line in stdin:
@@ -281,19 +290,23 @@ for line in stdin:
 for i in range(0,len(ins_list)):
     mem[i]=ins_list[i]
     
-count = 1
+
 while(halt==False):
+    cycle+=1
+    x_arr.append(cycle)
     curr_ins=mem[pc]
-    print(convertBin(pc,8),count, end=" ")
+    y_arr.append(pc)
+    print(convertBin(pc,8), end=" ")
     op_dict[curr_ins[0:5]](curr_ins)
-    count +=1
     for i in reg_file:
         print(convertBin(i,16),end=" ")
     print("\n")
+plt.scatter(x_arr, y_arr)
+plt.show()
    
-"""
+
 for i in mem:
     print(i)
-    """
+    
 
-#fi.close()
+# fi.close()

@@ -4,8 +4,8 @@ Created on Wed Aug 18 20:53:39 2021
 @author: AKSHITA
 """
 from sys import stdin
-# import matplotlib.pyplot as plt
-# import numpy as np
+import matplotlib.pyplot as plt
+import numpy as np
 
 mem=['0000000000000000']*256 #initialising memory
 
@@ -305,8 +305,8 @@ while(halt==False):
     for i in reg_file:
         print(convertBin(i,16),end=" ")
     print("\n")
-# plt.scatter(x_arr, y_arr)
-# plt.show()
+plt.scatter(x_arr, y_arr)
+plt.show()
    
 
 for i in mem:
